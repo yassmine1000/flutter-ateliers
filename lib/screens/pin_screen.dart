@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../auth/auth_state.dart';
+import '../widgets/auth_status_banner.dart';
 
 class PinScreen extends ConsumerStatefulWidget {
   const PinScreen({super.key});
@@ -29,6 +30,7 @@ class _PinScreenState extends ConsumerState<PinScreen> {
   Widget build(BuildContext context) {
     final error = ref.watch(authProvider).error;
     return Scaffold(
+      bottomNavigationBar: const AuthStatusBanner(),
       appBar: AppBar(
         title: const Text('Validation 2FA'),
         actions: [

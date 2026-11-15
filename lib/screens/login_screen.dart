@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../auth/auth_state.dart';
+import '../widgets/auth_status_banner.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -32,6 +33,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final error = ref.watch(authProvider).error;
     return Scaffold(
+      bottomNavigationBar: const AuthStatusBanner(),
       appBar: AppBar(title: const Text('Connexion')),
       body: Center(
         child: ConstrainedBox(

@@ -1,17 +1,32 @@
-# mon_atelier02
+# Atelier 02 — Tunnel d'authentification (Flutter)
 
-A new Flutter project.
+Login → validation 2FA par code PIN → Accueil.
+**GoRouter** orchestre routes et redirections, **Riverpod** expose l'état d'authentification de façon réactive.
 
-## Getting Started
+## Lancer
+```
+flutter pub get
+flutter run
+flutter test
+```
+Identifiants de test (simulés) : `admin` / `admin123`, puis PIN `123456`.
 
-This project is a starting point for a Flutter application.
+## Architecture
+- `lib/auth/auth_state.dart` : 3 états (`unauthenticated`, `pendingTwoFactor`, `authenticated`), `AuthNotifier`, limite de 3 PIN erronés.
+- `lib/router.dart` : `redirect` selon l'état + `refreshListenable` branché sur Riverpod.
+- `lib/screens/` : Login, PIN, Accueil (aucune navigation manuelle).
+- `lib/widgets/auth_status_banner.dart` : affiche l'état courant (état observé).
 
-A few resources to get you started if this is your first Flutter project:
+## Défi : navigation dépendante de l'état
+| État | Redirection |
+|---|---|
+| Non authentifié | tout mène à `/login` |
+| Après login | tout mène à `/2fa` |
+| Après 2FA | accès à `/home`, `/login` et `/2fa` redirigent vers `/home` |
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Tests
+- `test/auth_notifier_test.dart` : logique d'état (identifiants, PIN, tentatives, logout).
+- `test/auth_flow_test.dart` : contournement impossible de `/home`, réaction de l'UI.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Limites (volontaires)
+Identifiants et PIN codés en dur, pas de persistance de session : traités à l'atelier 04.

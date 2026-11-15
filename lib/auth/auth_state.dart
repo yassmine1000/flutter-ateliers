@@ -6,7 +6,12 @@ enum AuthStatus { unauthenticated, pendingTwoFactor, authenticated }
 class AuthState {
   final AuthStatus status;
   final String? error;
-  const AuthState({this.status = AuthStatus.unauthenticated, this.error});
+  final int pinAttempts;
+  const AuthState({
+    this.status = AuthStatus.unauthenticated,
+    this.error,
+    this.pinAttempts = 0,
+  });
 }
 
 class AuthNotifier extends Notifier<AuthState> {
@@ -14,6 +19,7 @@ class AuthNotifier extends Notifier<AuthState> {
   static const _user = 'admin';
   static const _password = 'admin123';
   static const _pin = '123456';
+  static const maxPinAttempts = 3;
 
   @override
   AuthState build() => const AuthState();
@@ -29,15 +35,25 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   /// Étape 2 : PIN -> n'est accepté que si le login a réussi avant.
+  /// Après [maxPinAttempts] échecs, retour au login (anti force brute).
   Future<void> verifyPin(String pin) async {
     if (state.status != AuthStatus.pendingTwoFactor) return;
     await Future.delayed(const Duration(milliseconds: 400));
+    if (state.status != AuthStatus.pendingTwoFactor) return; // logout pendant l'attente
     if (pin == _pin) {
       state = const AuthState(status: AuthStatus.authenticated);
-    } else {
+      return;
+    }
+    final attempts = state.pinAttempts + 1;
+    if (attempts >= maxPinAttempts) {
       state = const AuthState(
+        error: 'Trop de tentatives, reconnectez-vous',
+      );
+    } else {
+      state = AuthState(
         status: AuthStatus.pendingTwoFactor,
-        error: 'Code PIN incorrect',
+        error: 'Code PIN incorrect ($attempts/$maxPinAttempts)',
+        pinAttempts: attempts,
       );
     }
   }
