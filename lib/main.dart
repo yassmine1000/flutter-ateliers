@@ -1,9 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import 'router.dart';
+import 'weather/data/weather_cache.dart';
 
-void main() => runApp(const ProviderScope(child: App()));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  final box = await Hive.openBox<String>('weather_cache');
+  runApp(
+    ProviderScope(
+      overrides: [
+        weatherCacheProvider.overrideWithValue(HiveWeatherCache(box)),
+      ],
+      child: const App(),
+    ),
+  );
+}
 
 class App extends ConsumerWidget {
   const App({super.key});

@@ -6,6 +6,7 @@ import 'auth/auth_state.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/pin_screen.dart';
+import 'weather/monitoring_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   // Pont Riverpod -> GoRouter : quand le statut change, le router
@@ -32,6 +33,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
       GoRoute(path: '/2fa', builder: (_, __) => const PinScreen()),
       GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
+      // Protégée comme /home : le redirect renvoie vers /login si non authentifié.
+      GoRoute(
+        path: '/monitoring',
+        builder: (_, __) => const MonitoringScreen(),
+      ),
     ],
   );
 });
